@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>マインスイーパ</title>
+	<link rel="stylesheet" href="css/style.css">
+	<script src="https://kit.fontawesome.com/b9f2dda8ca.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div id="app">
+	<div class="board" :class="boardClass">
+		<div class="board_head">
+			<div class="board_head_level">
+				<select v-model="level">
+					<option value="1">難易度：低</option>
+					<option value="2">難易度：中</option>
+					<option value="3">難易度：高</option>
+				</select>
+			</div>
+			<div class="board_head_flag">
+				<i class="fas fa-flag"></i>{{board.bomb - board.flagCount}}
+			</div>
+			<div class="board_head_face">
+				<i class="fas" :class="board.icon"></i>
+			</div>
+		</div>
+		<div class="board_row" v-for="boardRow of board">
+			<span class="cell" :class="getCellClass(cell)" v-for="cell of boardRow" @click="clickCell(cell)"
+				  @click.right.prevent="rightClickCell(cell)">
+				<template v-if="canShowCellContent(cell)">
+				<i class="fas fa-bomb" v-if="cell.hasBomb"></i>
+				<span class="cell_num" v-if="!cell.hasBomb && 0 < cell.aroundBombCount">{{cell.aroundBombCount}}</span>
+				</template>
+			</span>
+		</div>
+	</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<script src="js/Board.js"></script>
+<script src="js/Cell.js"></script>
+<script src="js/Calculator.js"></script>
+<script src="js/BoardAnalyzer.js"></script>
+<script>
+	let boardAnalyzer = null;
+	new Vue({
+		el: '#app',
+		data: {
+			status: Board.CREATED,
+			debugMode: false,
+			row: 8,
+			col: 10,
+			bomb: 10,
+			board: {},
+			level: '1',
+			boardClass: '',
+		},
+		mounted: function () {
+			this.debugMode = location.search.match(/debug/) !== null;
+			if (this.debugMode) {
+				this.boardClass = 'is-debug';
+			}
+			this.init();
+		},
+		watch: {
+			level: function() {
+				if (this.level === '1') {
+					this.row = 8;
+					this.col = 10;
+					this.bomb = 10;
+				} else if (this.level === '2') {
+					this.row = 14;
+					this.col = 18;
+					this.bomb = 40;
+				} else if (this.level === '3') {
+					this.row = 20;
+					this.col = 24;
+					this.bomb = 99;
+				}
+				this.init();
+			},
+			status: function() {
+				if (this.status === Board.LOST) {
+					this.boardClass += ' is-lost';
+				} else if (this.status === Board.FINISHED) {
+					this.boardClass += ' is-finished';
+				}
+				boardAnalyzer.setIcon();
+			},
+		},
+		methods: {
+			init() {
+				let board = new Board();
+				board.set(this.row, this.col, this.bomb);
+				this.board = board;
+				boardAnalyzer = new BoardAnalyzer(board);
+			},
+			clickCell(cell) {
+				boardAnalyzer.openCell(cell);
+				this.status = this.board.status;
+			},
+			rightClickCell(cell) {
+				boardAnalyzer.onFlag(cell);
+			},
+			getCellClass(cell) {
+				if (cell.opened) {
+					return 'is-opened';
+				} else if (cell.hasFlag) {
+					return 'is-flag';
+				}
+			},
+			canShowCellContent(cell) {
+				return (this.board.status !== Board.STARTED) || cell.opened || this.debugMode;
+			},
+		}
+	});
+</script>
+</body>
+</html>

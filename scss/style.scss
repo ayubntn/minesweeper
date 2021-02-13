@@ -1,0 +1,137 @@
+@charset "utf-8";
+
+$color-border: rgba(130, 82, 41, 0.76);
+$color-cell-bg: #9fda73;
+$color-cell-bg-open: rgba(198, 158, 99, 0.85);
+$color-flag: #ff3c00;
+$color-face: (
+	fa-grin-hearts: pink,
+	fa-grin-beam: orange,
+	fa-laugh-wink: yellow,
+	fa-grin-stars: palegreen,
+	fa-sad-tear: darkblue,
+	fa-tired: black,
+	fa-flushed: red,
+	fa-dizzy: crimson,
+);
+$border-width: 1px;
+
+.board {
+	display: inline-block;
+	border-width: 0 0 $border-width $border-width;
+	border-style: solid;
+	border-color: $color-border;
+	line-height: 0;
+
+	&.is-lost {
+		.board_row {
+			filter: grayscale(100%);
+		}
+	}
+
+	&.is-finished {
+		.board_row {
+			opacity: .7;
+		}
+	}
+
+	&.is-debug {
+		.cell_num, .cell .fas.fa-bomb {
+			opacity: .2;
+		}
+	}
+
+	&_head {
+		display: flex;
+		padding: 15px;
+		background-color: #337133;
+		line-height: 1;
+		border-width: $border-width $border-width 0 0;
+		border-style: solid;
+		border-color: $color-border;
+		color: #fff;
+		font-size: 20px;
+		font-weight: bold;
+
+		&_level {
+			margin-right: 30px;
+
+			& > select {
+				padding: 5px 8px;
+			}
+		}
+
+		&_flag {
+			display: flex;
+			align-items: center;
+			margin-right: 30px;
+
+			& > .fa-flag {
+				color: $color-flag;
+				margin-right: 10px;
+			}
+		}
+
+		&_face {
+			display: flex;
+			align-items: center;
+			font-size: 28px;
+
+			@each $face, $color in $color-face {
+				.#{$face} {
+					color: $color;
+				}
+			}
+		}
+	}
+
+	.cell {
+		position: relative;
+		display: inline-block;
+		width: 50px;
+		height: 50px;
+		border-width: $border-width $border-width 0 0;
+		border-style: solid;
+		border-color: $color-border;
+		background-color: $color-cell-bg;
+		vertical-align: bottom;
+
+		&.is-opened {
+			background-color: $color-cell-bg-open;
+
+			&:hover {
+				background-color: lighten($color-cell-bg-open, 10%);
+			}
+		}
+
+		&.is-flag {
+			&::before {
+				font-family: "Font Awesome 5 Free";
+				content: '\f024';
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+				color: $color-flag;
+				font-size: 22px;
+				font-weight: 900;
+			}
+		}
+
+		&_num {
+
+		}
+
+		&_num, .fas.fa-bomb {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			font-size: 30px;
+		}
+
+		&:hover {
+			background-color: lighten($color-cell-bg, 10%);
+		}
+	}
+}
