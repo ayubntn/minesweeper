@@ -2,21 +2,16 @@
 
 $color-border: rgba(130, 82, 41, 0.76);
 $color-cell-bg: #9fda73;
-$color-cell-bg-open: rgba(198, 158, 99, 0.85);
+$color-cell-bg-open: #CFAC7B;
 $color-flag: #ff3c00;
-$color-face: (
-	fa-grin-hearts: pink,
-	fa-grin-beam: orange,
-	fa-laugh-wink: yellow,
-	fa-grin-stars: palegreen,
-	fa-sad-tear: darkblue,
-	fa-tired: black,
-	fa-flushed: red,
-	fa-dizzy: crimson,
-);
-$border-width: 1px;
+$border-width: 0px;
+
+body {
+	position: relative;
+}
 
 .board {
+	position: relative;
 	display: inline-block;
 	border-width: 0 0 $border-width $border-width;
 	border-style: solid;
@@ -24,14 +19,25 @@ $border-width: 1px;
 	line-height: 0;
 
 	&.is-lost {
-		.board_row {
-			filter: grayscale(100%);
-		}
+		animation: hurueru .1s 10;
 	}
 
 	&.is-finished {
-		.board_row {
-			opacity: .7;
+		.cell {
+			transition: background-color .5s;
+			background-color: pink;
+
+			&.is-opened {
+				background-color: pink;
+			}
+
+			.fas.fa-bomb {
+				margin-top: 10px;
+
+				&:before {
+					content: '\f004';
+				}
+			}
 		}
 	}
 
@@ -76,11 +82,19 @@ $border-width: 1px;
 			display: flex;
 			align-items: center;
 			font-size: 28px;
+		}
+	}
 
-			@each $face, $color in $color-face {
-				.#{$face} {
-					color: $color;
-				}
+	&_row {
+		&:nth-child(odd) {
+			.cell:nth-child(odd) {
+				opacity: .9;
+			}
+		}
+
+		&:nth-child(even) {
+			.cell:nth-child(even) {
+				opacity: .9;
 			}
 		}
 	}
@@ -88,8 +102,10 @@ $border-width: 1px;
 	.cell {
 		position: relative;
 		display: inline-block;
-		width: 50px;
-		height: 50px;
+		width: 40px;
+		height: 40px;
+		line-height: 40px;
+		text-align: center;
 		border-width: $border-width $border-width 0 0;
 		border-style: solid;
 		border-color: $color-border;
@@ -98,10 +114,6 @@ $border-width: 1px;
 
 		&.is-opened {
 			background-color: $color-cell-bg-open;
-
-			&:hover {
-				background-color: lighten($color-cell-bg-open, 10%);
-			}
 		}
 
 		&.is-flag {
@@ -123,15 +135,132 @@ $border-width: 1px;
 		}
 
 		&_num, .fas.fa-bomb {
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			font-size: 30px;
+			margin-top: 7px;
+			font-size: 25px;
 		}
 
 		&:hover {
-			background-color: lighten($color-cell-bg, 10%);
+			opacity: .8 !important;
 		}
+	}
+}
+
+.modal {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: rgba(#000, .5);
+
+	&_btn {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background-color: #9fda73;
+		line-height: 60px;
+		width: 240px;
+		text-align: center;
+		font-weight: bold;
+		border-radius: 60px;
+		cursor: pointer;
+	}
+}
+
+.fade-enter-active {
+	transition: opacity .5s 2s;
+}
+.fade-leave-active {
+	transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+	opacity: 0;
+}
+
+@keyframes boom {
+	0% {
+		transform: translateZ(0) translateX(50px) translateY(0px);
+	}
+	25% {
+		transform: translateZ(0) translateX(-450px) translateY(0px);
+	}
+	25.01% {
+		transform: translateZ(0) translateX(50px) translateY(-54px);
+	}
+	50% {
+		transform: translateZ(0) translateX(-450px) translateY(-54px);
+	}
+	50.01% {
+		transform: translateZ(0) translateX(50px) translateY(-108px);
+	}
+	75% {
+		transform: translateZ(0) translateX(-450px) translateY(-108px);
+	}
+	75.01% {
+		transform: translateZ(0) translateX(50px) translateY(-162px);
+	}
+	100% {
+		transform: translateZ(0) translateX(-450px) translateY(-162px);
+	}
+}
+
+.explosion {
+	overflow: hidden;
+	position: relative;
+}
+
+.explosion:after {
+	position: absolute;
+	top: -10px;
+	left: -5px;
+	width: 500px;
+	height: 215px;
+	content: "";
+	display: block;
+	background-image: url(../images/explosion.png);
+	transform: translateZ(0) translateX(-450px) translateY(-162px);
+	animation: boom 2s steps(10, start) 1;
+}
+
+.buruburu {
+	animation: hurueru .1s infinite;
+}
+
+@keyframes hurueru {
+	0% {
+		transform: translate(0px, 0px) rotateZ(0deg)
+	}
+	25% {
+		transform: translate(2px, 2px) rotateZ(1deg)
+	}
+	50% {
+		transform: translate(0px, 2px) rotateZ(0deg)
+	}
+	75% {
+		transform: translate(2px, 0px) rotateZ(-1deg)
+	}
+	100% {
+		transform: translate(0px, 0px) rotateZ(0deg)
+	}
+}
+
+@keyframes fuwafuwa {
+	0% {
+		transform: translate(0, 0) rotate(-5deg);
+	}
+	50% {
+		transform: translate(0, -5px) rotate(0deg);
+	}
+	100% {
+		transform: translate(0, 0) rotate(5deg);
+	}
+}
+
+.heart {
+	color: red;
+
+	i {
+		animation: fuwafuwa 1s infinite;
 	}
 }

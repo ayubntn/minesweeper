@@ -16,9 +16,9 @@
 		<div class="board_head">
 			<div class="board_head_level">
 				<select v-model="level">
-					<option value="1">難易度：低</option>
-					<option value="2">難易度：中</option>
-					<option value="3">難易度：高</option>
+					<option value="1">かんたん</option>
+					<option value="2">ふつう</option>
+					<option value="3">むずかしい</option>
 				</select>
 			</div>
 			<div class="board_head_flag">
@@ -32,11 +32,17 @@
 			<span class="cell" :class="getCellClass(cell)" v-for="cell of boardRow" @click="clickCell(cell)"
 				  @click.right.prevent="rightClickCell(cell)">
 				<template v-if="canShowCellContent(cell)">
-				<i class="fas fa-bomb" v-if="cell.hasBomb"></i>
-				<span class="cell_num" v-if="!cell.hasBomb && 0 < cell.aroundBombCount">{{cell.aroundBombCount}}</span>
+					<i class="fas fa-bomb" v-if="cell.hasBomb"></i>
+					<span class="cell_num"
+						  v-if="!cell.hasBomb && 0 < cell.aroundBombCount">{{cell.aroundBombCount}}</span>
 				</template>
 			</span>
 		</div>
+		<transition name="fade">
+			<div class="modal" v-if="showModal()" @click="init()">
+				<div class="modal_btn"><i class="fas fa-redo-alt"></i> もういちど　あそぶ</div>
+			</div>
+		</transition>
 	</div>
 </div>
 
@@ -67,7 +73,7 @@
 			this.init();
 		},
 		watch: {
-			level: function() {
+			level: function () {
 				if (this.level === '1') {
 					this.row = 8;
 					this.col = 10;
@@ -83,11 +89,13 @@
 				}
 				this.init();
 			},
-			status: function() {
+			status: function () {
 				if (this.status === Board.LOST) {
 					this.boardClass += ' is-lost';
 				} else if (this.status === Board.FINISHED) {
 					this.boardClass += ' is-finished';
+				} else {
+					this.boardClass = '';
 				}
 				boardAnalyzer.setIcon();
 			},
@@ -98,6 +106,7 @@
 				board.set(this.row, this.col, this.bomb);
 				this.board = board;
 				boardAnalyzer = new BoardAnalyzer(board);
+				this.status = Board.CREATED;
 			},
 			clickCell(cell) {
 				boardAnalyzer.openCell(cell);
@@ -107,6 +116,13 @@
 				boardAnalyzer.onFlag(cell);
 			},
 			getCellClass(cell) {
+				if (cell.hasBomb) {
+					if (this.status === Board.LOST) {
+						return 'explosion';
+					} else if (this.status === Board.FINISHED) {
+						return 'heart';
+					}
+				}
 				if (cell.opened) {
 					return 'is-opened';
 				} else if (cell.hasFlag) {
@@ -115,6 +131,9 @@
 			},
 			canShowCellContent(cell) {
 				return (this.board.status !== Board.STARTED) || cell.opened || this.debugMode;
+			},
+			showModal() {
+				return this.status === Board.FINISHED || this.status === Board.LOST;
 			},
 		}
 	});

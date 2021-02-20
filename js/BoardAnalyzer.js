@@ -72,6 +72,8 @@ class BoardAnalyzer {
 			array = Board.FINISHED_ICONS;
 		} else if (this.board.status === Board.LOST) {
 			array = Board.LOST_ICONS;
+		} else {
+			return;
 		}
 		this.board.icon = array[Math.floor(Math.random() * array.length)];
 	}
