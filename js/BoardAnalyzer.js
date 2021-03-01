@@ -113,6 +113,9 @@ class BoardAnalyzer {
 	setAroundBombCount() {
 		for (let boardRow of this.board) {
 			for (let cell of boardRow) {
+				if (cell.hasBomb) {
+					continue;
+				}
 				cell.aroundBombCount = this.countAroundBomb(cell);
 			}
 		}

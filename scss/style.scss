@@ -18,11 +18,11 @@ body {
 	border-color: $color-border;
 	line-height: 0;
 
-	&.is-lost {
+	&.isLost {
 		animation: hurueru .1s 10;
 	}
 
-	&.is-finished {
+	&.isFinished {
 		.cell {
 			transition: background-color .5s;
 			background-color: pink;
@@ -41,7 +41,7 @@ body {
 		}
 	}
 
-	&.is-debug {
+	&.isDebug {
 		.cell_num, .cell .fas.fa-bomb {
 			opacity: .2;
 		}
@@ -168,13 +168,10 @@ body {
 	}
 }
 
-.fade-enter-active {
-	transition: opacity .5s 2s;
-}
-.fade-leave-active {
+.fade-enter-active, .fade-leave-active {
 	transition: opacity .5s;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-enter, .fade-leave-to {
 	opacity: 0;
 }
 

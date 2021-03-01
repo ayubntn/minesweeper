@@ -33,13 +33,12 @@
 				  @click.right.prevent="rightClickCell(cell)">
 				<template v-if="canShowCellContent(cell)">
 					<i class="fas fa-bomb" v-if="cell.hasBomb"></i>
-					<span class="cell_num"
-						  v-if="!cell.hasBomb && 0 < cell.aroundBombCount">{{cell.aroundBombCount}}</span>
+					<span class="cell_num" v-if=" 0 < cell.aroundBombCount">{{cell.aroundBombCount}}</span>
 				</template>
 			</span>
 		</div>
 		<transition name="fade">
-			<div class="modal" v-if="showModal()" @click="init()">
+			<div class="modal" v-if="showModal" @click="init()">
 				<div class="modal_btn"><i class="fas fa-redo-alt"></i> もういちど　あそぶ</div>
 			</div>
 		</transition>
@@ -63,12 +62,17 @@
 			bomb: 10,
 			board: {},
 			level: '1',
-			boardClass: '',
+			boardClass: {
+				isDebug: false,
+				isLost: false,
+				isFinished: false,
+			},
+			showModal: false,
 		},
 		mounted: function () {
 			this.debugMode = location.search.match(/debug/) !== null;
 			if (this.debugMode) {
-				this.boardClass = 'is-debug';
+				this.boardClass.isDebug = true;
 			}
 			this.init();
 		},
@@ -91,11 +95,14 @@
 			},
 			status: function () {
 				if (this.status === Board.LOST) {
-					this.boardClass += ' is-lost';
+					this.boardClass.isLost = true;
+					this.setShowModal();
 				} else if (this.status === Board.FINISHED) {
-					this.boardClass += ' is-finished';
+					this.boardClass.isFinished = true;
+					this.setShowModal();
 				} else {
-					this.boardClass = '';
+					this.boardClass.isLost = false;
+					this.boardClass.isFinished = false;
 				}
 				boardAnalyzer.setIcon();
 			},
@@ -107,6 +114,7 @@
 				this.board = board;
 				boardAnalyzer = new BoardAnalyzer(board);
 				this.status = Board.CREATED;
+				this.showModal = false;
 			},
 			clickCell(cell) {
 				boardAnalyzer.openCell(cell);
@@ -132,8 +140,10 @@
 			canShowCellContent(cell) {
 				return (this.board.status !== Board.STARTED) || cell.opened || this.debugMode;
 			},
-			showModal() {
-				return this.status === Board.FINISHED || this.status === Board.LOST;
+			setShowModal() {
+				setTimeout(() => {
+					this.showModal = true;
+				}, 2000);
 			},
 		}
 	});
